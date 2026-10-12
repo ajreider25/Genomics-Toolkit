@@ -34,6 +34,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to the Snakefile."
     )
 
+    run_parser.add_argument(
+        "--input",
+        type=str,
+        default=None,
+        help="Path to the input FASTA file."
+    )
+
+    run_parser.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help="Path for the output CSV report."
+    )
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -48,7 +62,9 @@ def main(argv: list[str] | None = None) -> int:
 
         return run_workflow(
             cores=args.cores,
-            snakefile=args.snakefile
+            snakefile=args.snakefile,
+            input_path=args.input,
+            output_path=args.output
         )
     
     return 1
