@@ -1,0 +1,20 @@
+
+rule all:
+    input:
+        "results/hello.txt"
+
+rule hello:
+    output:
+        "results/hello.txt"
+    run:
+        from pathlib import Path
+
+        output_path = Path(str(output[0]))
+        output_path.parent.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        output_path.write_text(
+            "Genomics Toolkit pipeline works!\n"
+        )

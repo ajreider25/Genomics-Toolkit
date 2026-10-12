@@ -1,0 +1,22 @@
+[project]
+name = "genomics-toolkit"
+version = "0.1.0"
+description = "A modular Python toolkit for genomic analysis"
+readme = "README.md"
+authors = [
+    { name = "ajreider25", email = "ajreider25@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+genomics-toolkit = "genomics_toolkit.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+workflow = [
+    "snakemake>=9.27.0",
+]
