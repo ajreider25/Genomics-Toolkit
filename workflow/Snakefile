@@ -1,20 +1,30 @@
+from pathlib import Path
+
+INPUT_FASTA = config.get(
+    "input",
+    "data/sample.fasta"
+)
+
+OUTPUT_CSV = config.get(
+    "output",
+    "results/fasta_stats.csv"
+)
 
 rule all:
     input:
-        "results/hello.txt"
+        OUTPUT_CSV
 
-rule hello:
+rule fasta_statistics:
+    input:
+        INPUT_FASTA
     output:
-        "results/hello.txt"
+        OUTPUT_CSV
     run:
-        from pathlib import Path
-
-        output_path = Path(str(output[0]))
-        output_path.parent.mkdir(
-            parents=True,
-            exist_ok=True
+        from genomics_toolkit.operations.fasta_stats import (
+            write_fasta_stats
         )
 
-        output_path.write_text(
-            "Genomics Toolkit pipeline works!\n"
+        write_fasta_stats(
+            input_path=input[0],
+            output_path=output[0]
         )

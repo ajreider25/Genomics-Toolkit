@@ -1,5 +1,7 @@
 import argparse
+import sys
 from.workflow_runner import run_workflow
+from .operations.fasta_stats import write_fasta_stats
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -34,6 +36,35 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to the Snakefile."
     )
 
+    run_parser.add_argument(
+        "--input",
+        default=None,
+        help="Input FASTA file.",
+    )
+
+    run_parser.add_argument(
+        "--output",
+        default=None,
+        help="Output CSV file.",
+    )
+
+    fasta_parser = subparsers.add_parser(
+        "fasta-stats",
+        help="Calculate statistics for a FASTA file."
+    )
+
+    fasta_parser.add_argument(
+        "--input",
+        required=True,
+        help="Path to the input FASTA file."
+    )
+
+    fasta_parser.add_argument(
+        "--output",
+        required=True,
+        help="Path for the output CSV report."
+    )
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -45,10 +76,25 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "run":
         if args.cores < 1:
             parser.error("--cores must be at least 1")
-
+    
         return run_workflow(
             cores=args.cores,
-            snakefile=args.snakefile
+            snakefile=args.snakefile,
+            input_path=args.input,
+            output_path=args.output
         )
+
+    if args.command == "fasta-stats":
+        try:
+            write_fasta_stats(
+                input_path=args.input,
+                output_path=args.output
+            )
+        except (OSError, ValueError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+    
+        print(f"FASTA statistics written to: {args.output}")
+        return 0
     
     return 1
