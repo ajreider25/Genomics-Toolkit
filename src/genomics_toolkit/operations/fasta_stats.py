@@ -71,7 +71,14 @@ def write_fasta_stats(
 ) -> None:
     """Write FASTA sequence stats to a CSV file"""
 
+    input_path = Path(input_path)
     output_path = Path(output_path)
+
+    if not input_path.is_file():
+        raise FileNotFoundError(
+            f"FASTA input file not found: {input_path}"
+        )
+    
     output_path.parent.mkdir(
         parents=True,
         exist_ok=True
