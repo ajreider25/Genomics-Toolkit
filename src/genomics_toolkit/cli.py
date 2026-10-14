@@ -1,7 +1,11 @@
 import argparse
 import sys
+from pathlib import Path
 from.workflow_runner import run_workflow
-from .operations.fasta_stats import write_fasta_stats
+from .operations.fasta_stats import (
+    write_fasta_stats,
+    write_assembly_stats
+)
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -65,6 +69,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path for the output CSV report."
     )
 
+    fasta_parser.add_argument(
+        "--summary",
+        default=None,
+        help="Optional path for assembly summary CSV."
+    )
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -86,15 +96,34 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "fasta-stats":
         try:
+            if args.summary:
+                if Path(args.output).resolve() == Path(args.summary).resolve():
+                    print(
+                        "Error: --output and --summary must be different files.",
+                        file=sys.stderr,
+                    )
+                    return 1
+                
             write_fasta_stats(
                 input_path=args.input,
                 output_path=args.output
             )
+
+            if args.summary:
+                write_assembly_stats(
+                    input_path=args.input,
+                    output_path=args.summary
+                )
+
         except (OSError, ValueError) as exc:
             print(f"Error: {exc}", file=sys.stderr)
             return 1
     
         print(f"FASTA statistics written to: {args.output}")
+
+        if args.summary:
+            print(f"Assembly summary written to: {args.summary}")
+
         return 0
     
     return 1
