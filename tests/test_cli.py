@@ -46,3 +46,21 @@ def test_fasta_stats_cli_missing_input(tmp_path):
 
     assert exit_code == 1
     assert not output_file.exists()
+
+
+
+def test_cli_rejects_identical_output_paths(tmp_path):
+    input_file = tmp_path / "sample.fasta"
+    output_file = tmp_path / "stats.csv"
+
+    input_file.write_text(">seq1\nACGT\n")
+
+    exit_code = main([
+        "fasta-stats",
+        "--input", str(input_file),
+        "--output", str(output_file),
+        "--summary", str(output_file),
+    ])
+
+    assert exit_code == 1
+    assert not output_file.exists()
