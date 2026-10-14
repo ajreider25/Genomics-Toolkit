@@ -16,6 +16,7 @@ def test_calculate_stats():
 
     assert result["length"] == 6
     assert result["gc_percent"] == 50.0
+    assert result["at_percent"] == 50.0
     assert result["n_count"] == 2
 
 def test_empty_sequence():
@@ -23,6 +24,7 @@ def test_empty_sequence():
 
     assert result["length"] == 0
     assert result["gc_percent"] == 0.0
+    assert result["at_percent"] == 0.0
     assert result["n_count"] == 0
 
 def test_fasta_stats(tmp_path):
@@ -40,13 +42,23 @@ def test_fasta_stats(tmp_path):
             "sequence_id": "seq1",
             "length": 4,
             "gc_percent": 50.0,
+            "at_percent": 50.0,
             "n_count": 0,
+            "a_count": 1,
+            "c_count": 1,
+            "g_count": 1,
+            "t_count": 1
         },
         {
             "sequence_id": "seq2",
             "length": 6,
             "gc_percent": 100.0,
+            "at_percent": 0.0,
             "n_count": 2,
+            "a_count": 0,
+            "c_count": 2,
+            "g_count": 2,
+            "t_count": 0
         },
     ]
 
@@ -81,14 +93,24 @@ def test_write_fasta_stats(tmp_path):
         "sequence_id": "seq1",
         "length": "4",
         "gc_percent": "50.0",
+        "at_percent": "50.0",
         "n_count": "0",
+        "a_count": "1",
+        "c_count": "1",
+        "g_count": "1",
+        "t_count": "1"
     }
 
     assert rows[1] == {
         "sequence_id": "seq2",
         "length": "6",
         "gc_percent": "100.0",
+        "at_percent": "0.0",
         "n_count": "2",
+        "a_count": "0",
+        "c_count": "2",
+        "g_count": "2",
+        "t_count": "0"
     }
 
 def test_run_workflow_with_custom_paths(tmp_path):
@@ -128,6 +150,7 @@ def test_lowercase_sequence():
 
     assert result["length"] == 10
     assert result["gc_percent"] == 50.0
+    assert result["at_percent"] == 50.0
     assert result["n_count"] == 2
 
 
@@ -146,20 +169,17 @@ def test_multiline_fasta(tmp_path):
 
     results = list(fasta_stats(fasta_file))
 
-    assert results == [
-        {
-            "sequence_id": "seq1",
-            "length": 8,
-            "gc_percent": 75.0,
-            "n_count": 0,
-        },
-        {
-            "sequence_id": "seq2",
-            "length": 8,
-            "gc_percent": 0.0,
-            "n_count": 4,
-        },
-    ]
+    assert len(results) == 2
+
+    assert results[0]["sequence_id"] == "seq1"
+    assert results[0]["length"] == 8
+    assert results[0]["gc_percent"] == 75.0
+    assert results[0]["n_count"] == 0
+
+    assert results[1]["sequence_id"] == "seq2"
+    assert results[1]["length"] == 8
+    assert results[1]["gc_percent"] == 0.0
+    assert results[1]["n_count"] == 4
 
 
 def test_only_ambiguous_bases():
@@ -168,6 +188,7 @@ def test_only_ambiguous_bases():
 
     assert result["length"] == 6
     assert result["gc_percent"] == 0.0
+    assert result["at_percent"] == 0.0
     assert result["n_count"] == 6
 
 
@@ -193,17 +214,14 @@ def test_empty_fasta_sequence(tmp_path):
 
     results = list(fasta_stats(fasta_file))
 
-    assert results == [
-        {
-            "sequence_id": "empty",
-            "length": 0,
-            "gc_percent": 0.0,
-            "n_count": 0,
-        },
-        {
-            "sequence_id": "valid",
-            "length": 4,
-            "gc_percent": 50.0,
-            "n_count": 0,
-        },
-    ]
+    assert len(results) == 2
+
+    assert results[0]["sequence_id"] == "empty"
+    assert results[0]["length"] == 0
+    assert results[0]["gc_percent"] == 0.0
+    assert results[0]["n_count"] == 0
+
+    assert results[1]["sequence_id"] == "valid"
+    assert results[1]["length"] == 4
+    assert results[1]["gc_percent"] == 50.0
+    assert results[1]["n_count"] == 0

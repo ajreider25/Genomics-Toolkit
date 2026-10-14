@@ -27,6 +27,11 @@ def test_fasta_stats_cli(tmp_path):
         "length": "6",
         "gc_percent": "50.0",
         "n_count": "2",
+        "a_count": "1",
+        "c_count": "1",
+        "g_count": "1",
+        "t_count": "1",
+        "at_percent": "50.0",
     }]
 
 
