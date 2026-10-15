@@ -10,6 +10,7 @@ from .operations.fasta_validate import (
     validate_fasta,
     write_validation_report
 )
+from .operations.fasta_filter import filter_fasta
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -100,6 +101,43 @@ def build_parser() -> argparse.ArgumentParser:
         "--report",
         default=None,
         help="Optional path for a JSON validation report."
+    )
+
+    filter_parser = subparsers.add_parser(
+        "fasta-filter",
+        help="Filter FASTA records by length or sequence id."
+    )
+
+    filter_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTA file."
+    )
+
+    filter_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTA file"
+    )
+
+    filter_parser.add_argument(
+        "--min-length",
+        type=int,
+        default=None,
+        help="Minimum sequence length (inclusive)."
+    )
+
+    filter_parser.add_argument(
+        "--max-length",
+        type=int,
+        default=None,
+        help="Maximum sequence length (inclusive)."
+    )
+
+    filter_parser.add_argument(
+        "--ids",
+        default=None,
+        help="Comma-seperated sequence IDs to retain."
     )
 
     return parser
@@ -194,5 +232,39 @@ def main(argv: list[str] | None = None) -> int:
 
         print("FASTA validation failed.")
         return 1
+
+    if args.command == "fasta-filter":
+        try:
+            selected_ids = None
+
+            if args.ids is not None:
+                selected_ids = {
+                    item.strip()
+                    for item in args.ids.split(",")
+                    if item.strip()
+                }
+
+                if not selected_ids:
+                    raise ValueError(
+                        "--ids must contain at least one sequence ID."
+                    )
+
+            result = filter_fasta(
+                input_path=args.input,
+                output_path=args.output,
+                min_length=args.min_length,
+                max_length=args.max_length,
+                ids=selected_ids
+            )
+
+        except (OSError, ValueError, EOFError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Sequences processed: {result['total_records']}")
+        print(f"Sequences retained: {result['retained_records']}")
+        print(f"Sequences removed: {result['removed_records']}")
+
+        return 0
     
     return 1
