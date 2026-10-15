@@ -6,6 +6,10 @@ from .operations.fasta_stats import (
     write_fasta_stats,
     write_assembly_stats
 )
+from .operations.fasta_validate import (
+    validate_fasta,
+    write_validation_report
+)
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -75,6 +79,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional path for assembly summary CSV."
     )
 
+    validate_parser = subparsers.add_parser(
+        "fasta-validate",
+        help="Validate DNA FASTA files."
+    )
+
+    validate_parser.add_argument(
+        "--input",
+        required=True,
+        help="Path to the FASTA file."
+    )
+
+    validate_parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Treat empty sequences and empty files as errors."
+    )
+
+    validate_parser.add_argument(
+        "--report",
+        default=None,
+        help="Optional path for a JSON validation report."
+    )
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -125,5 +152,47 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Assembly summary written to: {args.summary}")
 
         return 0
+
+    if args.command == "fasta-validate":
+        try:
+            if args.report:
+                if Path(args.input).resolve() == Path(args.report).resolve():
+                    print(
+                        "Error: Input FASTA and JSON report must be different files.",
+                        file=sys.stderr
+                    )
+                    return 1
+                
+            report = validate_fasta(
+                input_path=args.input,
+                strict=args.strict
+            )
+
+            if args.report:
+                write_validation_report(
+                    report=report,
+                    output_path=args.report,
+                    input_path=args.input)
+                
+        except (OSError, ValueError, EOFError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Sequences checked: {report['sequence_count']}")
+        print(f"Errors: {report['error_count']}")
+        print(f"Warnings: {report['warning_count']}")
+
+        for error in report["errors"]:
+            print(f"ERROR: {error}")
+
+        for warning in report["warnings"]:
+            print(f"WARNING: {warning}")
+
+        if report["valid"]:
+            print("FASTA validation passed.")
+            return 0
+
+        print("FASTA validation failed.")
+        return 1
     
     return 1
