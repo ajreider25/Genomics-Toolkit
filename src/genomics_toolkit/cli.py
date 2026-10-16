@@ -11,6 +11,8 @@ from .operations.fasta_validate import (
     write_validation_report
 )
 from .operations.fasta_filter import filter_fasta
+from .operations.fasta_revcomp import write_reverse_complement
+
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -140,6 +142,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Comma-seperated sequence IDs to retain."
     )
 
+    revcomp_parser = subparsers.add_parser(
+        "fasta-revcomp",
+        help="Generate reverse-complement DNA FASTA sequences."
+    )
+
+    revcomp_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTA or FASTA.gz file"
+    )
+
+    revcomp_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTA or FASTA.gz file"
+    )
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -264,6 +283,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Sequences processed: {result['total_records']}")
         print(f"Sequences retained: {result['retained_records']}")
         print(f"Sequences removed: {result['removed_records']}")
+
+        return 0
+
+    if args.command == "fasta-revcomp":
+        try:
+            result = write_reverse_complement(
+                input_path=args.input,
+                output_path=args.output
+            )
+
+        except (OSError, ValueError, EOFError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Sequences processed: {result['sequence_count']}")
+        print(f"Total bases: {result['total_bases']}")
 
         return 0
     
