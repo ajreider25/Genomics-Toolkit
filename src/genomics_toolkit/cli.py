@@ -12,7 +12,7 @@ from .operations.fasta_validate import (
 )
 from .operations.fasta_filter import filter_fasta
 from .operations.fasta_revcomp import write_reverse_complement
-
+from .operations.fasta_extract import extract_fasta
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -26,6 +26,8 @@ def build_parser() -> argparse.ArgumentParser:
         dest="command",
         required=True
     )
+
+
 
     ## Pipeline execution command
     run_parser = subparsers.add_parser(
@@ -59,28 +61,32 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output CSV file.",
     )
 
-    fasta_parser = subparsers.add_parser(
+
+
+    stats_parser = subparsers.add_parser(
         "fasta-stats",
         help="Calculate statistics for a FASTA file."
     )
 
-    fasta_parser.add_argument(
+    stats_parser.add_argument(
         "--input",
         required=True,
         help="Path to the input FASTA file."
     )
 
-    fasta_parser.add_argument(
+    stats_parser.add_argument(
         "--output",
         required=True,
         help="Path for the output CSV report."
     )
 
-    fasta_parser.add_argument(
+    stats_parser.add_argument(
         "--summary",
         default=None,
         help="Optional path for assembly summary CSV."
     )
+
+
 
     validate_parser = subparsers.add_parser(
         "fasta-validate",
@@ -104,6 +110,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional path for a JSON validation report."
     )
+
+
 
     filter_parser = subparsers.add_parser(
         "fasta-filter",
@@ -142,6 +150,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Comma-seperated sequence IDs to retain."
     )
 
+
+
     revcomp_parser = subparsers.add_parser(
         "fasta-revcomp",
         help="Generate reverse-complement DNA FASTA sequences."
@@ -157,6 +167,31 @@ def build_parser() -> argparse.ArgumentParser:
         "--output",
         required=True,
         help="Output FASTA or FASTA.gz file"
+    )
+
+
+
+    extract_parser = subparsers.add_parser(
+        "fasta-extract",
+        help="Extract FASTA sequences using an ID selection file."
+    )
+
+    extract_parser.add_argument(
+        "--input",
+        required=True,
+        help="Text FASTA or FASTA.gz file."
+    )
+
+    extract_parser.add_argument(
+        "--ids-file",
+        required=True,
+        help="Text file containong one sequence ID per line."
+    )
+
+    extract_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTA or FASTA.gz file."
     )
 
     return parser
@@ -299,6 +334,32 @@ def main(argv: list[str] | None = None) -> int:
 
         print(f"Sequences processed: {result['sequence_count']}")
         print(f"Total bases: {result['total_bases']}")
+
+        return 0
+
+    if args.command == "fasta-extract":
+        try:
+            result = extract_fasta(
+                input_path=args.input,
+                ids_file=args.ids_file,
+                output_path=args.output
+            )
+
+        except (OSError, ValueError, EOFError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Sequences processed: {result['total_records']}")
+        print(f"Sequences extracted: {result['extracted_records']}")
+        print(f"Unique IDs requested: {result['requested_ids']}")
+        print(f"Unique IDs found: {result['found_ids']}")
+
+        if result["missing_ids"]:
+            print(
+                "WARNING: IDs not found: "
+                + ", ".join(result["missing_ids"]),
+                file=sys.stderr
+            )
 
         return 0
     
