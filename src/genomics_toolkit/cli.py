@@ -14,6 +14,7 @@ from .operations.fasta_filter import filter_fasta
 from .operations.fasta_revcomp import write_reverse_complement
 from .operations.fasta_extract import extract_fasta
 from .operations.fasta_split import split_fasta
+from .operations.fasta_merge import merge_fasta
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -227,6 +228,32 @@ def build_parser() -> argparse.ArgumentParser:
         help="Compress output files using gzip."
     )
 
+
+    merge_parser = subparsers.add_parser(
+        "fasta-merge",
+        help="Merge multiple FASTA files.",
+    )
+
+    merge_parser.add_argument(
+        "--inputs",
+        nargs="+",
+        required=True,
+        help="Input FASTA files in merge order.",
+    )
+
+    merge_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTA or FASTA.gz file.",
+    )
+
+    merge_parser.add_argument(
+        "--allow-duplicates",
+        action="store_true",
+        help="Allow duplicate sequence IDs.",
+    )
+
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -413,5 +440,26 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Output directory: {result['output_dir']}")
 
         return 0
+
+    if args.command == "fasta-merge":
+        try:
+            result = merge_fasta(
+                input_paths=args.inputs,
+                output_path=args.output,
+                allow_duplicates=args.allow_duplicates,
+            )
+        except (OSError, ValueError, EOFError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Input files merged: {result['input_files']}")
+        print(f"Sequences merged: {result['total_records']}")
+        print(f"Total bases: {result['total_bases']}")
+        print(f"Duplicate IDs: {result['duplicate_ids']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
+
+
     
     return 1
