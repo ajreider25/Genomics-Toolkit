@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from genomics_toolkit.workflow_runner import run_workflow
 
-from genomics_toolkit.operations.fasta_stats import (
+from genomics_toolkit.operations.fasta.fasta_stats import (
     calculate_stats,
     fasta_stats,
     write_fasta_stats,

@@ -4,11 +4,11 @@ import gzip
 import pytest
 
 from genomics_toolkit.cli import main
-from genomics_toolkit.operations.fasta_revcomp import (
+from genomics_toolkit.operations.fasta.fasta_revcomp import (
     reverse_complement,
     write_reverse_complement,
 )
-from genomics_toolkit.operations.fasta_stats import read_fasta
+from genomics_toolkit.operations.fasta.fasta_stats import read_fasta
 
 
 def test_reverse_complement_basic():

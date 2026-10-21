@@ -1,7 +1,7 @@
 
 import gzip
 
-from genomics_toolkit.operations.fasta_stats import (
+from genomics_toolkit.operations.fasta.fasta_stats import (
     calculate_stats,
     fasta_stats,
 )

@@ -2,19 +2,19 @@ import argparse
 import sys
 from pathlib import Path
 from.workflow_runner import run_workflow
-from .operations.fasta_stats import (
+from .operations.fasta.fasta_stats import (
     write_fasta_stats,
     write_assembly_stats
 )
-from .operations.fasta_validate import (
+from .operations.fasta.fasta_validate import (
     validate_fasta,
     write_validation_report
 )
-from .operations.fasta_filter import filter_fasta
-from .operations.fasta_revcomp import write_reverse_complement
-from .operations.fasta_extract import extract_fasta
-from .operations.fasta_split import split_fasta
-from .operations.fasta_merge import merge_fasta
+from .operations.fasta.fasta_filter import filter_fasta
+from .operations.fasta.fasta_revcomp import write_reverse_complement
+from .operations.fasta.fasta_extract import extract_fasta
+from .operations.fasta.fasta_split import split_fasta
+from .operations.fasta.fasta_merge import merge_fasta
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""

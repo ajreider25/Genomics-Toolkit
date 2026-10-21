@@ -20,7 +20,7 @@ rule fasta_statistics:
     output:
         OUTPUT_CSV
     run:
-        from genomics_toolkit.operations.fasta_stats import (
+        from genomics_toolkit.operations.fasta.fasta_stats import (
             write_fasta_stats
         )
 

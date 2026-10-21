@@ -4,11 +4,11 @@ import gzip
 import pytest
 
 from genomics_toolkit.cli import main
-from genomics_toolkit.operations.fasta_extract import (
+from genomics_toolkit.operations.fasta.fasta_extract import (
     extract_fasta,
     read_ids_file,
 )
-from genomics_toolkit.operations.fasta_stats import read_fasta
+from genomics_toolkit.operations.fasta.fasta_stats import read_fasta
 
 
 @pytest.fixture

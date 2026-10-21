@@ -4,8 +4,8 @@ import gzip
 import pytest
 
 from genomics_toolkit.cli import main
-from genomics_toolkit.operations.fasta_merge import merge_fasta
-from genomics_toolkit.operations.fasta_stats import read_fasta
+from genomics_toolkit.operations.fasta.fasta_merge import merge_fasta
+from genomics_toolkit.operations.fasta.fasta_stats import read_fasta
 
 
 @pytest.fixture

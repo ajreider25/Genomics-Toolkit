@@ -3,7 +3,7 @@ import gzip
 import json
 import pytest
 
-from genomics_toolkit.operations.fasta_validate import (
+from genomics_toolkit.operations.fasta.fasta_validate import (
     validate_fasta,
     write_validation_report
 )

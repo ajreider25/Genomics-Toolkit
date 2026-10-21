@@ -2,7 +2,7 @@
 import csv
 import gzip
 
-from genomics_toolkit.operations.fasta_stats import (
+from genomics_toolkit.operations.fasta.fasta_stats import (
     calculate_assembly_stats,
     read_fasta,
     write_assembly_stats,
@@ -152,7 +152,7 @@ def test_assembly_gc_excludes_ambiguous_bases():
 
 import pytest
 
-from genomics_toolkit.operations.fasta_stats import (
+from genomics_toolkit.operations.fasta.fasta_stats import (
     calculate_assembly_stats,
     write_assembly_stats,
 )
