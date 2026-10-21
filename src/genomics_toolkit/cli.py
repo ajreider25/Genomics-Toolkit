@@ -20,6 +20,10 @@ from .operations.fastq.fastq_validate import (
     validate_fastq,
     write_validation_report as write_fastq_validation_report,
 )
+from .operations.fastq.fastq_stats import (
+    calculate_fastq_stats,
+    write_fastq_stats,
+)
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -282,6 +286,23 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    
+    fastq_stats_parser = subparsers.add_parser(
+        "fastq-stats",
+        help="Calculate FASTQ sequencing quality statistics.",
+    )
+
+    fastq_stats_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTQ or FASTQ.gz file.",
+    )
+
+    fastq_stats_parser.add_argument(
+        "--output",
+        help="Optional JSON statistics output file.",
+    )
+
 
     return parser
 
@@ -522,6 +543,34 @@ def main(argv: list[str] | None = None) -> int:
             print(f"WARNING: {warning}", file=sys.stderr)
 
         return 0 if report["valid"] else 1
+
+    
+    if args.command == "fastq-stats":
+        try:
+            stats = calculate_fastq_stats(args.input)
+
+            if args.output:
+                write_fastq_stats(
+                    stats,
+                    args.output,
+                    input_path=args.input,
+                )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Reads: {stats['read_count']}")
+        print(f"Total bases: {stats['total_bases']}")
+        print(f"Min read length: {stats['min_read_length']}")
+        print(f"Max read length: {stats['max_read_length']}")
+        print(f"Mean read length: {stats['mean_read_length']:.2f}")
+        print(f"GC content: {stats['gc_percent']:.2f}%")
+        print(f"Mean Phred quality: {stats['mean_quality']:.2f}")
+        print(f"Q20 bases: {stats['q20_percent']:.2f}%")
+        print(f"Q30 bases: {stats['q30_percent']:.2f}%")
+
+        return 0
 
     
     return 1
