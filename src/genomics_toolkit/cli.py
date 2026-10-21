@@ -16,6 +16,11 @@ from .operations.fasta.fasta_extract import extract_fasta
 from .operations.fasta.fasta_split import split_fasta
 from .operations.fasta.fasta_merge import merge_fasta
 
+from .operations.fastq.fastq_validate import (
+    validate_fastq,
+    write_validation_report as write_fastq_validation_report,
+)
+
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
 
@@ -254,6 +259,30 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    fastq_validate_parser = subparsers.add_parser(
+        "fastq-validate",
+        help="Validate FASTQ files.",
+    )
+
+    fastq_validate_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTQ or FASTQ.gz file.",
+    )
+
+    fastq_validate_parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Treat empty sequences and empty files as errors.",
+    )
+
+    fastq_validate_parser.add_argument(
+        "--report",
+        help="Optional JSON validation report path.",
+    )
+
+
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -460,6 +489,39 @@ def main(argv: list[str] | None = None) -> int:
 
         return 0
 
+
+    
+    if args.command == "fastq-validate":
+        try:
+            report = validate_fastq(
+                input_path=args.input,
+                strict=args.strict,
+            )
+
+            if args.report:
+                write_fastq_validation_report(
+                    report,
+                    args.report,
+                    input_path=args.input,
+                )
+
+        except (OSError, ValueError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Valid FASTQ: {report['valid']}")
+        print(f"Records: {report['record_count']}")
+        print(f"Total bases: {report['total_bases']}")
+        print(f"Errors: {report['error_count']}")
+        print(f"Warnings: {report['warning_count']}")
+
+        for error in report["errors"]:
+            print(f"ERROR: {error}", file=sys.stderr)
+
+        for warning in report["warnings"]:
+            print(f"WARNING: {warning}", file=sys.stderr)
+
+        return 0 if report["valid"] else 1
 
     
     return 1
