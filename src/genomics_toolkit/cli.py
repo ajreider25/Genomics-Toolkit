@@ -13,6 +13,7 @@ from .operations.fasta_validate import (
 from .operations.fasta_filter import filter_fasta
 from .operations.fasta_revcomp import write_reverse_complement
 from .operations.fasta_extract import extract_fasta
+from .operations.fasta_split import split_fasta
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -194,6 +195,38 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output FASTA or FASTA.gz file."
     )
 
+
+
+    split_parser = subparsers.add_parser(
+        "fasta-split",
+        help="Split a FASTA into smaller files."
+    )
+
+    split_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTA or FASTA.gz file."
+    )
+
+    split_parser.add_argument(
+        "--output-dir",
+        required=True,
+        help="New directory for output FASTA chunks."
+    )
+
+    split_parser.add_argument(
+        "--records-per-file",
+        type=int,
+        default=1000,
+        help="Maximum number of records per file (default: 1000)."
+    )
+
+    split_parser.add_argument(
+        "--gzip",
+        action="store_true",
+        help="Compress output files using gzip."
+    )
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -360,6 +393,24 @@ def main(argv: list[str] | None = None) -> int:
                 + ", ".join(result["missing_ids"]),
                 file=sys.stderr
             )
+
+        return 0
+
+    if args.command == "fasta-split":
+        try:
+            result = split_fasta(
+                input_path=args.input,
+                output_dir=args.output_dir,
+                records_per_file=args.records_per_file,
+                gzip_output=args.gzip
+            )
+        except (OSError, ValueError, EOFError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Sequences processed: {result['total_records']}")
+        print(f"Output files created: {result['file_count']}")
+        print(f"Output directory: {result['output_dir']}")
 
         return 0
     
