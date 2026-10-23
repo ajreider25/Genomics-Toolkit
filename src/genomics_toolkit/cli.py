@@ -24,6 +24,7 @@ from .operations.fastq.fastq_stats import (
     calculate_fastq_stats,
     write_fastq_stats,
 )
+from .operations.fastq.fastq_filter import filter_fastq
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -304,6 +305,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    
+    fastq_filter_parser = subparsers.add_parser(
+        "fastq-filter",
+        help="Filter FASTQ reads by length, quality, and N content.",
+    )
+
+    fastq_filter_parser.add_argument("--input", required=True)
+    fastq_filter_parser.add_argument("--output", required=True)
+    fastq_filter_parser.add_argument("--min-length", type=int)
+    fastq_filter_parser.add_argument("--max-length", type=int)
+    fastq_filter_parser.add_argument("--min-quality", type=float)
+    fastq_filter_parser.add_argument("--max-n-percent", type=float)
+
+
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -571,6 +587,29 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Q30 bases: {stats['q30_percent']:.2f}%")
 
         return 0
+
+    
+    if args.command == "fastq-filter":
+        try:
+            result = filter_fastq(
+                input_path=args.input,
+                output_path=args.output,
+                min_length=args.min_length,
+                max_length=args.max_length,
+                min_quality=args.min_quality,
+                max_n_percent=args.max_n_percent,
+            )
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Total reads: {result['total_reads']}")
+        print(f"Kept reads: {result['kept_reads']}")
+        print(f"Filtered reads: {result['filtered_reads']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
+
 
     
     return 1
