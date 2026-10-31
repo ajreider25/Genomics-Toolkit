@@ -26,6 +26,13 @@ from .operations.fastq.fastq_stats import (
 )
 from .operations.fastq.fastq_filter import filter_fastq
 
+from .operations.fastq.fastq_trim import trim_fastq
+
+
+
+
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
 
@@ -320,6 +327,38 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 
+    fastq_trim_parser = subparsers.add_parser(
+        "fastq-trim",
+        help="Trim low-quality bases from the 3' ends of FASTQ reads.",
+    )
+
+    fastq_trim_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTQ or FASTQ.gz file.",
+    )
+
+    fastq_trim_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTQ or FASTQ.gz file.",
+    )
+
+    fastq_trim_parser.add_argument(
+        "--min-quality",
+        type=int,
+        default=20,
+        help="Minimum Phred quality to retain at the 3' end (default: 20).",
+    )
+
+    fastq_trim_parser.add_argument(
+        "--min-length",
+        type=int,
+        default=0,
+        help="Discard reads shorter than this after trimming (default: 0).",
+    )
+
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -606,6 +645,29 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Total reads: {result['total_reads']}")
         print(f"Kept reads: {result['kept_reads']}")
         print(f"Filtered reads: {result['filtered_reads']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
+
+
+    if args.command == "fastq-trim":
+        try:
+            result = trim_fastq(
+                input_path=args.input,
+                output_path=args.output,
+                min_quality=args.min_quality,
+                min_length=args.min_length,
+            )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Total reads: {result['total_reads']}")
+        print(f"Kept reads: {result['kept_reads']}")
+        print(f"Trimmed reads: {result['trimmed_reads']}")
+        print(f"Discarded reads: {result['discarded_reads']}")
+        print(f"Bases removed: {result['bases_removed']}")
         print(f"Output: {result['output_path']}")
 
         return 0
