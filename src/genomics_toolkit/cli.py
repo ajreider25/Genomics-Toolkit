@@ -25,9 +25,8 @@ from .operations.fastq.fastq_stats import (
     write_fastq_stats,
 )
 from .operations.fastq.fastq_filter import filter_fastq
-
 from .operations.fastq.fastq_trim import trim_fastq
-
+from .operations.fastq.fastq_sample import sample_fastq
 
 
 
@@ -359,6 +358,48 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    fastq_sample_parser = subparsers.add_parser(
+        "fastq-sample",
+        help="Randomly sample FASTQ reads.",
+    )
+
+    fastq_sample_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTQ or FASTQ.gz file.",
+    )
+
+    fastq_sample_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTQ or FASTQ.gz file.",
+    )
+
+    sample_group = fastq_sample_parser.add_mutually_exclusive_group(
+        required=True
+    )
+
+    sample_group.add_argument(
+        "--count",
+        type=int,
+        help="Exact number of reads to sample (or all reads if fewer exist).",
+    )
+
+    sample_group.add_argument(
+        "--fraction",
+        type=float,
+        help="Probability of selecting each read, from 0 to 1.",
+    )
+
+    fastq_sample_parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed for reproducible sampling (default: 42).",
+    )
+
+
+
     return parser
 
 def main(argv: list[str] | None = None) -> int:
@@ -671,6 +712,31 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Output: {result['output_path']}")
 
         return 0
+
+    
+    if args.command == "fastq-sample":
+        try:
+            result = sample_fastq(
+                input_path=args.input,
+                output_path=args.output,
+                count=args.count,
+                fraction=args.fraction,
+                seed=args.seed,
+            )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Total reads: {result['total_reads']}")
+        print(f"Sampled reads: {result['sampled_reads']}")
+        print(f"Discarded reads: {result['discarded_reads']}")
+        print(f"Method: {result['method']}")
+        print(f"Seed: {result['seed']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
+
 
 
     
