@@ -28,7 +28,7 @@ from .operations.fastq.fastq_filter import filter_fastq
 from .operations.fastq.fastq_trim import trim_fastq
 from .operations.fastq.fastq_sample import sample_fastq
 from .operations.fastq.fastq_convert import fastq_to_fasta
-
+from .operations.fastq.fastq_merge import merge_fastq
 
 
 
@@ -424,6 +424,25 @@ def build_parser() -> argparse.ArgumentParser:
         help="FASTA sequence line width (default: 80).",
     )
 
+ 
+    fastq_merge_parser = subparsers.add_parser(
+        "fastq-merge",
+        help="Merge multiple FASTQ files.",
+    )
+
+    fastq_merge_parser.add_argument(
+        "--inputs",
+        nargs="+",
+        required=True,
+        help="Input FASTQ or FASTQ.gz files in merge order.",
+    )
+
+    fastq_merge_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTQ or FASTQ.gz file.",
+    )
+
 
     return parser
 
@@ -790,6 +809,25 @@ def main(argv: list[str] | None = None) -> int:
 
         return 0
 
+
+
+    if args.command == "fastq-merge":
+        try:
+            result = merge_fastq(
+                input_paths=args.inputs,
+                output_path=args.output,
+            )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Input files: {result['input_files']}")
+        print(f"Total reads: {result['total_reads']}")
+        print(f"Total bases: {result['total_bases']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
 
     
     return 1
