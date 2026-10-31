@@ -27,6 +27,7 @@ from .operations.fastq.fastq_stats import (
 from .operations.fastq.fastq_filter import filter_fastq
 from .operations.fastq.fastq_trim import trim_fastq
 from .operations.fastq.fastq_sample import sample_fastq
+from .operations.fastq.fastq_convert import fastq_to_fasta
 
 
 
@@ -399,8 +400,40 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    fastq_convert_parser = subparsers.add_parser(
+        "fastq-convert",
+        help="Convert FASTQ reads to FASTA sequences.",
+    )
+
+    fastq_convert_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input FASTQ or FASTQ.gz file.",
+    )
+
+    fastq_convert_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output FASTA or FASTA.gz file.",
+    )
+
+    fastq_convert_parser.add_argument(
+        "--line-width",
+        type=int,
+        default=80,
+        help="FASTA sequence line width (default: 80).",
+    )
+
 
     return parser
+
+
+
+
+
+
+
+
 
 def main(argv: list[str] | None = None) -> int:
     """Execute the requested CLI command."""
@@ -737,6 +770,25 @@ def main(argv: list[str] | None = None) -> int:
 
         return 0
 
+
+    
+    if args.command == "fastq-convert":
+        try:
+            result = fastq_to_fasta(
+                input_path=args.input,
+                output_path=args.output,
+                line_width=args.line_width,
+            )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Converted reads: {result['record_count']}")
+        print(f"Total bases: {result['total_bases']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
 
 
     
