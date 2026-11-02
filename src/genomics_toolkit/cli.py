@@ -29,7 +29,7 @@ from .operations.fastq.fastq_trim import trim_fastq
 from .operations.fastq.fastq_sample import sample_fastq
 from .operations.fastq.fastq_convert import fastq_to_fasta
 from .operations.fastq.fastq_merge import merge_fastq
-
+from .operations.fastq.fastq_pair_validate import validate_fastq_pairs
 
 
 
@@ -444,6 +444,25 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    fastq_pair_validate_parser = subparsers.add_parser(
+        "fastq-pair-validate",
+        help="Validate synchronized paired-end FASTQ files.",
+    )
+
+    fastq_pair_validate_parser.add_argument(
+        "--r1",
+        required=True,
+        help="R1 FASTQ or FASTQ.gz file.",
+    )
+
+    fastq_pair_validate_parser.add_argument(
+        "--r2",
+        required=True,
+        help="R2 FASTQ or FASTQ.gz file.",
+    )
+
+
+
     return parser
 
 
@@ -644,9 +663,8 @@ def main(argv: list[str] | None = None) -> int:
             result = merge_fasta(
                 input_paths=args.inputs,
                 output_path=args.output,
-                allow_duplicates=args.allow_duplicates,
             )
-        except (OSError, ValueError, EOFError) as exc:
+        except (OSError, ValueError, UnicodeError) as exc:
             print(f"Error: {exc}", file=sys.stderr)
             return 1
 
@@ -810,14 +828,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
 
-
     if args.command == "fastq-merge":
         try:
             result = merge_fastq(
                 input_paths=args.inputs,
                 output_path=args.output,
             )
-
         except (OSError, ValueError, UnicodeError) as exc:
             print(f"Error: {exc}", file=sys.stderr)
             return 1
@@ -826,8 +842,30 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Total reads: {result['total_reads']}")
         print(f"Total bases: {result['total_bases']}")
         print(f"Output: {result['output_path']}")
-
         return 0
+
+    
+    if args.command == "fastq-pair-validate":
+        result = validate_fastq_pairs(
+            r1_path=args.r1,
+            r2_path=args.r2,
+        )
+
+        print(f"Valid pairs: {result['pair_count']}")
+        print(f"R1 bases: {result['r1_bases']}")
+        print(f"R2 bases: {result['r2_bases']}")
+        print(f"Total bases: {result['total_bases']}")
+
+        if result["valid"]:
+            print("Paired-end FASTQ validation passed.")
+            return 0
+
+        print("Paired-end FASTQ validation failed.", file=sys.stderr)
+
+        for error in result["errors"]:
+            print(f"Error: {error}", file=sys.stderr)
+
+        return 1
 
     
     return 1
