@@ -31,7 +31,7 @@ from .operations.fastq.fastq_convert import fastq_to_fasta
 from .operations.fastq.fastq_merge import merge_fastq
 from .operations.fastq.fastq_pair_validate import validate_fastq_pairs
 
-
+from .operations.vcf.vcf_validate import validate_vcf
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -462,6 +462,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    vcf_validate_parser = subparsers.add_parser(
+        "vcf-validate",
+        help="Validate the structure of a VCF file.",
+    )
+
+    vcf_validate_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input VCF file to validate.",
+    )
+
+
 
     return parser
 
@@ -866,6 +878,27 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Error: {error}", file=sys.stderr)
 
         return 1
+
+
+    if args.command == "vcf-validate":
+        try:
+            result = validate_vcf(args.input)
+
+        except (OSError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Valid: {result['valid']}")
+        print(f"Records: {result['record_count']}")
+        print(f"Errors: {result['error_count']}")
+
+        if not result["valid"]:
+            for error in result["errors"]:
+                print(f"  - {error}", file=sys.stderr)
+            return 1
+
+        print("VCF validation passed.")
+        return 0
 
     
     return 1
