@@ -1,200 +1,200 @@
 # Genomics Toolkit
 
-A modular, extensible Python toolkit for genomic data processing, analysis, and reproducible bioinformatics workflows.
+**An AI-guided, hands-on bioinformatics learning project for understanding genomic data formats, developing computational tools, and exploring how bioinformatics is used to solve biological problems.**
 
 ## Overview
 
-**Genomics Toolkit** is an open-source project focused on developing computational tools that help researchers process genomic data and investigate biological questions.
+Genomics Toolkit is a Python-based project focused on learning bioinformatics through practical software development.
 
-The project begins with foundational operations for common bioinformatics file formats and aims to expand into integrated analysis workflows, comparative genomics, and machine-learning applications.
+The project explores the major file formats used in genomics, the biological information they represent, and the computational operations used to analyze them.
 
-The long-term goal is to provide both **ready-to-use tools for common biological analyses** and **flexible components for building more comprehensive research workflows**.
+Rather than simply using existing bioinformatics software, I am building my own implementations of common operations to develop a deeper understanding of how genomic data is structured, processed, validated, and interpreted.
 
-### Design Principles
+Development is guided by AI-assisted learning, with an emphasis on understanding the underlying concepts, reviewing implementations, writing tests, and gradually building more sophisticated tools.
 
-- **Biological relevance:** Develop functionality that supports meaningful biological analysis.
-- **Modularity:** Keep individual operations reusable and independently testable.
-- **Reproducibility:** Support consistent, documented, and repeatable analyses.
-- **Extensibility:** Allow new file formats, operations, and analytical methods to be integrated.
-- **Scalability:** Design with larger datasets, parallel execution, and comprehensive workflows in mind.
-- **Accessibility:** Provide a straightforward command-line interface alongside reusable Python functions.
+The long-term goal is to connect these foundational operations into reproducible workflows capable of addressing real biological questions.
 
-## Features
+## Why I'm Building This
 
-### FASTA Operations
+This project began as an effort to create a collection of genomics utilities, but it has evolved into a personal, AI-guided bioinformatics education project.
 
-The toolkit provides foundational functionality for working with FASTA sequence files.
+My goal is to learn the different data formats used throughout genomics, understand what each format represents, and explore how bioinformaticians use these data to investigate biological problems.
 
-| Command | Description |
-|---|---|
-| `fasta-stats` | Calculate sequence statistics and assembly-level metrics. |
-| `fasta-validate` | Validate FASTA structure and nucleotide sequences. |
-| `fasta-filter` | Filter sequences by length and identifiers. |
-| `fasta-revcomp` | Generate reverse-complement sequences. |
-| `fasta-extract` | Extract sequences using a file containing sequence identifiers. |
-| `fasta-split` | Split FASTA datasets into smaller files by record count. |
-| `fasta-merge` | Combine multiple FASTA files into one dataset. |
+I want to go beyond memorizing file specifications or learning commands. By implementing the operations myself, I can better understand what happens to genomic data at each stage of an analysis, why particular processing steps are necessary, and how individual tools fit into larger biological workflows.
 
-FASTA operations are designed to support both uncompressed and gzip-compressed data where applicable.
+AI serves as a learning and development partner throughout this process, helping me explore concepts, design implementations, troubleshoot problems, and evaluate different approaches. The objective is not simply to generate working code, but to develop my own understanding of the biology, data structures, algorithms, and software engineering practices involved.
 
-### FASTQ Operations - in development
+This repository documents that learning process as the toolkit grows.
 
-FASTQ functionality is under active development.
+## Learning Objectives
 
-| Command | Description | Status |
+Through this project, I aim to:
+
+- Understand the major file formats used in genomics and the biological information they contain.
+- Learn how common bioinformatics operations work by implementing them in Python.
+- Explore how genomic data moves through different stages of an analysis.
+- Develop skills in Python programming, command-line interfaces, automated testing, and version control.
+- Understand the biological reasoning behind data processing and analysis decisions.
+- Build reusable and reliable tools that can eventually be combined into complete bioinformatics workflows.
+- Explore more advanced approaches, including workflow automation, scalable analysis, and machine learning, as my understanding develops.
+
+## Supported Data Formats
+
+Development is organized around the major data formats encountered in genomics.
+
+| Format | Biological Information | Development Status |
 |---|---|---|
-| `fastq-validate` | Validate FASTQ records, nucleotide sequences, and quality-score structure. | Implemented |
-| `fastq-stats` | Calculate sequencing-read and quality statistics. | Planned |
-| `fastq-filter` | Filter reads by length, quality, and other criteria. | Planned |
-| `fastq-trim` | Trim low-quality bases from sequencing reads. | Planned |
-| `fastq-sample` | Sample reads from FASTQ datasets. | Planned |
-| `fastq-convert` | Convert FASTQ sequences to FASTA. | Planned |
-| `fastq-merge` | Combine FASTQ datasets. | Planned |
+| FASTA | DNA, RNA, and protein sequences | Foundational operations implemented |
+| FASTQ | Sequencing reads and base quality scores | Foundational operations implemented |
+| VCF/BCF | Genetic variants and genotype information | Planned next |
+| SAM/BAM/CRAM | Sequence alignments against reference genomes | Planned |
+| BED | Genomic intervals and regions | Planned |
+| GFF3/GTF | Gene structures and genomic annotations | Planned |
+
+Each format is approached as both a software development milestone and a learning opportunity.
+
+## Implemented Features
+
+### FASTA — Sequence Data
+
+FASTA is commonly used to represent nucleotide and protein sequences.
+
+Implemented operations:
+
+| Command | Purpose |
+|---|---|
+| `fasta-stats` | Calculate sequence and assembly statistics |
+| `fasta-validate` | Validate FASTA structure and sequence content |
+| `fasta-filter` | Select sequences using defined criteria |
+| `fasta-revcomp` | Generate reverse-complement sequences |
+| `fasta-extract` | Extract sequences by identifier |
+| `fasta-split` | Divide FASTA files into smaller files |
+| `fasta-merge` | Combine multiple FASTA files |
+
+**Learning focus:** Sequence representation, parsing, sequence composition, genome assembly statistics, and basic sequence manipulation.
+
+### FASTQ — Sequencing Read Data
+
+FASTQ represents sequencing reads together with their corresponding base quality scores.
+
+Implemented operations:
+
+| Command | Purpose |
+|---|---|
+| `fastq-validate` | Validate FASTQ records and quality scores |
+| `fastq-stats` | Calculate sequencing read and quality statistics |
+| `fastq-filter` | Filter reads using length, quality, and ambiguous-base criteria |
+| `fastq-trim` | Trim low-quality bases from read ends |
+| `fastq-sample` | Randomly sample sequencing reads |
+| `fastq-convert` | Convert FASTQ records to FASTA |
+| `fastq-merge` | Combine multiple FASTQ files |
+| `fastq-pair-validate` | Check paired-end FASTQ synchronization |
+
+**Learning focus:** Sequencing quality scores, read preprocessing, quality control, paired-end sequencing, and preparation of data for downstream analysis.
+
+Additional paired-end filtering and sampling operations are potential future enhancements.
 
 ## Installation
 
-### Prerequisites
-
-- Python 3.14 or a compatible version supported by the project
-- Git
-- [uv](https://docs.astral.sh/uv/), the Python package and project manager
+The project uses Python and [uv](https://docs.astral.sh/uv/) for dependency management.
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/<your-username>/Genomics-Toolkit.git
+git clone <repository-url>
 cd Genomics-Toolkit
 ```
 
-Install project dependencies:
+Install dependencies:
 
 ```bash
 uv sync
 ```
 
-Verify that the CLI is available:
+Display the command-line interface:
 
 ```bash
 uv run genomics-toolkit --help
 ```
 
-Optional workflow dependencies can be installed with:
+## Example Usage
 
-```bash
-uv sync --group workflow
-```
-
-## Usage
-
-The toolkit provides a command-line interface for executing individual genomic operations.
-
-### FASTA Statistics
-
-```bash
-uv run genomics-toolkit fasta-stats \
-    --input data/sample.fasta
-```
-
-### FASTA Validation
+### Validate a FASTA file
 
 ```bash
 uv run genomics-toolkit fasta-validate \
-    --input data/sample.fasta \
-    --strict \
-    --report results/fasta_validation.json
+  --input data/sample.fasta
 ```
 
-### FASTA Filtering
+### Calculate FASTA statistics
 
 ```bash
-uv run genomics-toolkit fasta-filter \
-    --input data/sample.fasta \
-    --output results/filtered.fasta \
-    --min-length 100
+uv run genomics-toolkit fasta-stats \
+  --input data/sample.fasta \
+  --output results/fasta_stats.json
 ```
 
-### FASTA Reverse Complement
-
-```bash
-uv run genomics-toolkit fasta-revcomp \
-    --input data/sample.fasta \
-    --output results/revcomp.fasta
-```
-
-### FASTA Extraction
-
-```bash
-uv run genomics-toolkit fasta-extract \
-    --input data/sample.fasta \
-    --ids-file data/selected_ids.txt \
-    --output results/extracted.fasta
-```
-
-### FASTA Splitting
-
-```bash
-uv run genomics-toolkit fasta-split \
-    --input data/sample.fasta \
-    --output-dir results/fasta_chunks \
-    --records-per-file 1000
-```
-
-### FASTA Merging
-
-```bash
-uv run genomics-toolkit fasta-merge \
-    --inputs results/fasta_chunks/part_001.fasta \
-             results/fasta_chunks/part_002.fasta \
-    --output results/merged.fasta
-```
-
-### FASTQ Validation
+### Validate FASTQ sequencing reads
 
 ```bash
 uv run genomics-toolkit fastq-validate \
-    --input data/sample.fastq \
-    --report results/fastq_validation.json
+  --input data/sample.fastq
 ```
 
-For command-specific options, use:
+### Trim low-quality reads
 
 ```bash
-uv run genomics-toolkit <command> --help
+uv run genomics-toolkit fastq-trim \
+  --input data/sample.fastq \
+  --output results/trimmed.fastq \
+  --min-quality 20 \
+  --min-length 4
 ```
 
-## Project Structure
+### Filter sequencing reads
 
-```text
-Genomics-Toolkit/
-├── src/
-│   └── genomics_toolkit/
-│       ├── cli.py
-│       ├── workflow_runner.py
-│       └── operations/
-│           ├── fasta/
-│           │   ├── fasta_stats.py
-│           │   ├── fasta_validate.py
-│           │   ├── fasta_filter.py
-│           │   ├── fasta_revcomp.py
-│           │   ├── fasta_extract.py
-│           │   ├── fasta_split.py
-│           │   └── fasta_merge.py
-│           └── fastq/
-│               └── fastq_validate.py
-├── tests/
-│   ├── fasta/
-│   └── fastq/
-├── workflow/
-├── data/
-├── pyproject.toml
-└── README.md
+```bash
+uv run genomics-toolkit fastq-filter \
+  --input results/trimmed.fastq \
+  --output results/filtered.fastq \
+  --min-length 4 \
+  --max-n-percent 20
 ```
 
-The project separates reusable operations from command-line handling and workflow orchestration.
+### Calculate FASTQ statistics
+
+```bash
+uv run genomics-toolkit fastq-stats \
+  --input results/filtered.fastq \
+  --output results/filtered_stats.json
+```
+
+### Validate paired-end sequencing reads
+
+```bash
+uv run genomics-toolkit fastq-pair-validate \
+  --r1 data/sample_R1.fastq \
+  --r2 data/sample_R2.fastq
+```
+
+These examples demonstrate how individual operations can be combined into simple data-processing workflows.
+
+## Development Approach
+
+The project follows an incremental, format-by-format development strategy.
+
+1. **Understand the format:** Study its structure, biological meaning, and common applications.
+2. **Implement foundational operations:** Build reusable Python functions for validation, statistics, filtering, and manipulation.
+3. **Expose CLI commands:** Make operations accessible through a consistent command-line interface.
+4. **Write automated tests:** Verify expected behavior, edge cases, and error handling using pytest.
+5. **Integrate operations:** Explore how individual tools work together to solve larger analysis problems.
+6. **Expand into workflows:** Gradually introduce reproducible, automated pipelines that connect multiple formats and analysis stages.
+
+This approach prioritizes understanding and reliability before increasing complexity.
 
 ## Testing
 
-Automated testing is performed using `pytest`.
+Automated tests are written using pytest.
 
 Run the complete test suite:
 
@@ -202,104 +202,60 @@ Run the complete test suite:
 uv run pytest -v
 ```
 
-Run FASTA-specific tests:
+Run tests for a particular format:
 
 ```bash
 uv run pytest tests/fasta/ -v
-```
-
-Run FASTQ-specific tests:
-
-```bash
 uv run pytest tests/fastq/ -v
 ```
 
-New operations should include tests covering expected behavior, malformed input, edge cases, and file-handling safety.
+Tests help ensure that operations behave consistently as new functionality is introduced.
 
-## Development Workflow
+## Roadmap
 
-Development follows a feature-branch workflow.
+### Phase 1 — Foundational Genomic Data Formats
 
-Individual implementations are developed and tested on separate branches.
+- [x] FASTA sequence operations
+- [x] FASTQ sequencing read operations
+- [ ] VCF/BCF variant operations
+- [ ] SAM/BAM/CRAM alignment operations
+- [ ] BED genomic interval operations
+- [ ] GFF3/GTF annotation operations
 
-For larger development phases, such as FASTQ, individual feature branches are merged into a format-specific integration branch.
+### Phase 2 — Integration and Biological Workflows
 
-For example:
+- Develop reusable operations that work across genomic data formats.
+- Create standard analysis workflows for common bioinformatics tasks.
+- Integrate workflow management and reproducible execution.
+- Explore realistic biological questions using representative datasets.
 
-```text
-main
-└── feature/fastq
-    ├── feature/fastq-validate
-    ├── feature/fastq-stats
-    ├── feature/fastq-filter
-    └── ...
-```
+### Phase 3 — Advanced Capabilities
 
-Once a format's foundational functionality is complete and tested, its integration branch can be merged into `main`.
+- Expand workflow functionality and scalability.
+- Explore additional genomic data formats.
+- Investigate computational methods for more advanced analyses.
+- Explore machine learning applications where biologically appropriate.
 
-This approach helps keep the main branch stable while allowing incremental development.
+The roadmap is expected to evolve alongside the learning process.
 
-## Development Roadmap
+## Project Philosophy
 
-### Phase 1: Foundational Genomics Operations
+The guiding principle of this project is **learning bioinformatics by building bioinformatics tools**.
 
-Establish reliable processing and analysis functionality for widely used genomics formats.
+Working software is important, but understanding the reasoning behind that software is equally important.
 
-| Format | Focus |
-|---|---|
-| FASTA | Sequence processing and assembly statistics |
-| FASTQ | Sequencing-read processing and quality control |
-| VCF/BCF | Genetic variation and genotype analysis |
-| SAM/BAM/CRAM | Sequencing alignments and coverage |
-| BED | Genomic interval operations |
-| GFF3/GTF | Gene and genomic feature annotations |
+Each feature should contribute to a broader understanding of how genomic data is generated, represented, transformed, and analyzed.
 
-### Phase 2: Biological Analysis Workflows
+Ultimately, the goal is not simply to accumulate commands. It is to develop the knowledge and practical skills needed to connect computational methods with meaningful biological questions.
 
-Develop configurable, reproducible pipelines for common biological applications, including:
+## AI-Assisted Development
 
-- Genome assembly quality assessment
-- Sequencing-read quality control
-- Alignment quality assessment
-- Variant analysis
-- Comparative genomics
-- Genomic annotation analysis
+This project is developed with assistance from AI tools, including ChatGPT.
 
-The toolkit includes initial workflow infrastructure using Snakemake. More comprehensive workflows are planned for future development.
+AI is used to support conceptual learning, software design, code development, debugging, testing, and technical discussion.
 
-### Phase 3: Advanced Analysis and Machine Learning
-
-Extend the toolkit with capabilities for:
-
-- Genomic feature extraction and engineering
-- Sequence classification
-- Variant effect prediction
-- Comparative genomic analysis
-- Biological phenotype prediction
-- Reproducible machine-learning experiments
-
-Machine learning will complement established bioinformatics methods rather than replace them.
+The project is intended to be an active learning process rather than a collection of automatically generated solutions. Understanding, testing, and critically evaluating implementations remain central to its purpose.
 
 ## Project Status
 
-**Active development — foundational genomics operations.**
-
-The project is currently focused on completing its core file-processing and analysis functionality before expanding into comprehensive biological workflows and machine-learning applications.
-
-Interfaces, supported formats, and functionality may evolve as development progresses.
-
-## Contributing
-
-Contributions, bug reports, feature suggestions, and improvements are welcome.
-
-When contributing:
-
-1. Create a branch for your proposed change.
-2. Keep implementations modular and focused.
-3. Include or update relevant tests.
-4. Run the test suite before submitting changes.
-5. Open a pull request describing the change and its purpose.
-
-## License
-
-License information will be added once a license has been selected.
+This is an evolving educational project. Implementations may be simplified compared with mature production bioinformatics software and should not be assumed to be suitable for clinical, diagnostic, or other high-stakes applications without independent validation.
