@@ -18,11 +18,11 @@ from .operations.fasta.fasta_merge import merge_fasta
 
 from .operations.fastq.fastq_validate import (
     validate_fastq,
-    write_validation_report as write_fastq_validation_report,
+    write_validation_report as write_fastq_validation_report
 )
 from .operations.fastq.fastq_stats import (
     calculate_fastq_stats,
-    write_fastq_stats,
+    write_fastq_stats
 )
 from .operations.fastq.fastq_filter import filter_fastq
 from .operations.fastq.fastq_trim import trim_fastq
@@ -32,6 +32,10 @@ from .operations.fastq.fastq_merge import merge_fastq
 from .operations.fastq.fastq_pair_validate import validate_fastq_pairs
 
 from .operations.vcf.vcf_validate import validate_vcf
+from .operations.vcf.vcf_stats import (
+    calculate_vcf_stats,
+    write_vcf_stats
+)
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -474,6 +478,23 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+    vcf_stats_parser = subparsers.add_parser(
+        "vcf-stats",
+        help="Calculate summary statistics for a VCF file.",
+    )
+
+    vcf_stats_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input VCF file.",
+    )
+
+    vcf_stats_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output JSON statistics file.",
+    )
+
 
     return parser
 
@@ -898,6 +919,34 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
         print("VCF validation passed.")
+        return 0
+
+
+    if args.command == "vcf-stats":
+        try:
+            stats = calculate_vcf_stats(args.input)
+
+            write_vcf_stats(
+                stats,
+                args.output,
+            )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Total records: {stats['total_records']}")
+        print(f"Alternate alleles: {stats['total_alt_alleles']}")
+        print(f"SNVs: {stats['snvs']}")
+        print(f"MNVs: {stats['mnvs']}")
+        print(f"Insertions: {stats['insertions']}")
+        print(f"Deletions: {stats['deletions']}")
+        print(f"Transitions: {stats['transitions']}")
+        print(f"Transversions: {stats['transversions']}")
+        print(f"Ti/Tv ratio: {stats['titv_ratio']}")
+        print(f"Mean QUAL: {stats['mean_quality']}")
+        print(f"Output: {args.output}")
+
         return 0
 
     
