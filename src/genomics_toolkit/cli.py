@@ -36,6 +36,7 @@ from .operations.vcf.vcf_stats import (
     calculate_vcf_stats,
     write_vcf_stats
 )
+from .operations.vcf.vcf_filter import filter_vcf
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -496,6 +497,61 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
 
+
+    vcf_filter_parser = subparsers.add_parser(
+        "vcf-filter",
+        help="Filter VCF records by quality, depth, and variant type.",
+    )
+
+    vcf_filter_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input VCF file.",
+    )
+
+    vcf_filter_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output filtered VCF file.",
+    )
+
+    vcf_filter_parser.add_argument(
+        "--min-qual",
+        type=float,
+        help="Minimum variant QUAL score.",
+    )
+
+    vcf_filter_parser.add_argument(
+        "--pass-only",
+        action="store_true",
+        help="Keep only records with FILTER=PASS.",
+    )
+
+    vcf_filter_parser.add_argument(
+        "--chrom",
+        help="Keep variants on this chromosome.",
+    )
+
+    vcf_filter_parser.add_argument(
+        "--min-depth",
+        type=int,
+        help="Minimum site-level INFO/DP.",
+    )
+
+    vcf_filter_parser.add_argument(
+        "--variant-type",
+        choices=[
+            "snv",
+            "mnv",
+            "insertion",
+            "deletion",
+            "complex",
+        ],
+        help="Keep records containing this variant type.",
+    )
+
+
+
     return parser
 
 
@@ -948,6 +1004,31 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Output: {args.output}")
 
         return 0
+
+    
+    if args.command == "vcf-filter":
+        try:
+            result = filter_vcf(
+                input_path=args.input,
+                output_path=args.output,
+                min_qual=args.min_qual,
+                pass_only=args.pass_only,
+                chrom=args.chrom,
+                min_depth=args.min_depth,
+                variant_type=args.variant_type,
+            )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Total records: {result['total_records']}")
+        print(f"Kept records: {result['kept_records']}")
+        print(f"Filtered records: {result['filtered_records']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
+
 
     
     return 1
