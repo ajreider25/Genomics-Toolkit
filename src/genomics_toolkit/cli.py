@@ -37,6 +37,7 @@ from .operations.vcf.vcf_stats import (
     write_vcf_stats
 )
 from .operations.vcf.vcf_filter import filter_vcf
+from .operations.vcf.vcf_extract import extract_vcf
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
@@ -550,6 +551,53 @@ def build_parser() -> argparse.ArgumentParser:
         help="Keep records containing this variant type.",
     )
 
+ 
+    vcf_extract_parser = subparsers.add_parser(
+        "vcf-extract",
+        help="Extract VCF records by region or variant ID.",
+    )
+
+    vcf_extract_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input VCF file.",
+    )
+
+    vcf_extract_parser.add_argument(
+        "--output",
+        required=True,
+        help="Output VCF file.",
+    )
+
+    vcf_extract_parser.add_argument(
+        "--chrom",
+        help="Chromosome to extract.",
+    )
+
+    vcf_extract_parser.add_argument(
+        "--start",
+        type=int,
+        help="Start position (1-based, inclusive).",
+    )
+
+    vcf_extract_parser.add_argument(
+        "--end",
+        type=int,
+        help="End position (1-based, inclusive).",
+    )
+
+    vcf_extract_parser.add_argument(
+        "--id",
+        dest="variant_id",
+        help="Variant identifier to extract.",
+    )
+
+    vcf_extract_parser.add_argument(
+        "--ids-file",
+        help="Text file containing variant IDs.",
+    )
+
+
 
 
     return parser
@@ -1028,6 +1076,31 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Output: {result['output_path']}")
 
         return 0
+
+    
+    if args.command == "vcf-extract":
+        try:
+            result = extract_vcf(
+                input_path=args.input,
+                output_path=args.output,
+                chrom=args.chrom,
+                start=args.start,
+                end=args.end,
+                variant_id=args.variant_id,
+                ids_file=args.ids_file,
+            )
+
+        except (OSError, ValueError, UnicodeError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+
+        print(f"Total records: {result['total_records']}")
+        print(f"Extracted records: {result['extracted_records']}")
+        print(f"Excluded records: {result['excluded_records']}")
+        print(f"Output: {result['output_path']}")
+
+        return 0
+
 
 
     
